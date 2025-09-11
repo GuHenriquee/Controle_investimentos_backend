@@ -43,16 +43,17 @@ def registerUser(user: UserCreate):
 def operator(operation: Operation):
 
     lastOperation = {
-        "transactionType": operation.operationType,
         "amount":operation.amount,
+        "operationType": operation.operationType,
         "previousValue": operation.previousValue,
         "newValue": 0
     }
 
-    if (lastOperation['transactionType'] == "Retirar"):
-        lastOperation['newValue'] = Operations.minus( lastOperation['previousValue'], lastOperation['amount'])
-    else:
-        lastOperation['newValue'] = Operations.sum( lastOperation['previousValue'], lastOperation['amount'])
+    if (lastOperation):
+        if (lastOperation['operationType'] == "Retirar"):
+            lastOperation['newValue'] = Operations.minus( lastOperation['previousValue'], lastOperation['amount'])
+        else:
+            lastOperation['newValue'] = Operations.sum( lastOperation['previousValue'], lastOperation['amount'])
     
 
     return lastOperation
