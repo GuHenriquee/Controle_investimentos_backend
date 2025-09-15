@@ -1,11 +1,14 @@
-from objects import UserCreate, UserResponse, Operation, OperationResponse
+from objects import UserCreate, UserInDB, Operation, OperationResponse
 from operations import Operations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from uuid import uuid4
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from database import database
+from contextlib import asynccontextmanager
 
 app = FastAPI()
+
 
 # 1. Adicione o middleware de CORS
 app.add_middleware(
@@ -22,8 +25,8 @@ app.add_middleware(
 )
 
 # Adicione o 'response_model' para filtrar a resposta
-@app.post("/api/register/", response_model=UserResponse) 
-def registerUser(user: UserCreate):
+@app.post("/api/register/") 
+def create_user(user: UserCreate, session: database.SessionDep)-> UserInDB:
 
     final_user_data = {
         "id": uuid4(),
@@ -33,6 +36,9 @@ def registerUser(user: UserCreate):
         "patrimony": 0.0,
         "historic": []
     }
+    session.add(final_user_data)
+    session.commit()
+    session.refresh(final_user_data)
     
     print("Usuário para 'salvar' no banco de dados:", final_user_data)
 
