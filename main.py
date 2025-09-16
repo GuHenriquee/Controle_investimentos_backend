@@ -7,7 +7,12 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from database import database
 from contextlib import asynccontextmanager
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    database.create_db_and_tables()
+    yield
+    
+app = FastAPI(lifespan=lifespan)
 
 
 # 1. Adicione o middleware de CORS
@@ -28,21 +33,21 @@ app.add_middleware(
 @app.post("/api/register/") 
 def create_user(user: UserCreate, session: database.SessionDep)-> UserInDB:
 
-    final_user_data = {
-        "id": uuid4(),
-        "name": user.name,
-        "email": user.email,
-        "password": user.password,
-        "patrimony": 0.0,
-        "historic": []
-    }
-    session.add(final_user_data)
-    session.commit()
-    session.refresh(final_user_data)
-    
-    print("Usuário para 'salvar' no banco de dados:", final_user_data)
+    db_user = UserInDB(
+        name=user.name,
+        email=user.email,
+        password=user.password, # Idealmente, use o hashed_password aqui
+        # O ID, patrimony e historic serão preenchidos com os valores padrão
+        # definidos no seu modelo (default_factory=uuid4, default=0.0, etc.)
+    )
 
-    return final_user_data
+    session.add(db_user)
+    session.commit()
+    session.refresh(db_user)
+    
+    print("Usuário para 'salvar' no banco de dados:", db_user)
+
+    return db_user
 
 
 @app.post("/api/operation/", response_model=OperationResponse)
