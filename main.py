@@ -1,12 +1,15 @@
-from objects import UserCreate, UserInDB, Operation, OperationResponse
+from objects import UserCreate, UserInDB, Operation, OperationResponse, UserResponse
 from operations import Operations
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from database import database
 from contextlib import asynccontextmanager
 from ignore import Gitignore
 from passlib.context import CryptContext
+from sqlmodel import select
+
+
 
 
 @asynccontextmanager
@@ -17,7 +20,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto") 
+#"deprecated="auto"" fará com que senhas com hashes antigos sejam atualizadas automaticamente na próxima vez que o usuário fizer login.
 
 def hashing_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -37,9 +41,15 @@ app.add_middleware(
     allowed_hosts=["localhost", "127.0.0.1"] # 127.0.0.1 e localhost são a mesma coisa
 )
 
-# Adicione o 'response_model' para filtrar a resposta
-@app.post("/api/register/") 
-def create_user(user: UserCreate, session: database.SessionDep)-> UserInDB:
+
+@app.post("/api/register/", status_code=201) #201 = created
+def create_user(user: UserCreate, session: database.SessionDep)-> UserResponse:
+
+    query = select(UserInDB).where(UserInDB.email == user.email) #criando consulta
+    existing_user = session.exec(query).first()                  #executando consulta
+
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
 
     db_user = UserInDB(
         name=user.name,
