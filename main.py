@@ -2,10 +2,12 @@ from objects import UserCreate, UserInDB, Operation, OperationResponse
 from operations import Operations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from uuid import uuid4
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from database import database
 from contextlib import asynccontextmanager
+from ignore import Gitignore
+from passlib.context import CryptContext
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,10 +17,16 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hashing_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+
 # 1. Adicione o middleware de CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"], # A origem completa do frontend
+    allow_origins=[Gitignore.FRONT_URL], # A origem completa do frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -36,9 +44,7 @@ def create_user(user: UserCreate, session: database.SessionDep)-> UserInDB:
     db_user = UserInDB(
         name=user.name,
         email=user.email,
-        password=user.password, # Idealmente, use o hashed_password aqui
-        # O ID, patrimony e historic serão preenchidos com os valores padrão
-        # definidos no seu modelo (default_factory=uuid4, default=0.0, etc.)
+        password= hashing_password(user.password),  
     )
 
     session.add(db_user)
@@ -52,6 +58,7 @@ def create_user(user: UserCreate, session: database.SessionDep)-> UserInDB:
 
 @app.post("/api/operation/", response_model=OperationResponse)
 def operator(operation: Operation):
+    
 
     lastOperation = {
         "amount":operation.amount,

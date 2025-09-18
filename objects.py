@@ -29,6 +29,7 @@ class OperationInDB(SQLModel, table=True):
     user: Optional["UserInDB"] = Relationship(back_populates="historic") #estabelecendo uma conexão e não será uma tabela no DB
 
 class UserInDB(SQLModel, table=True):
+    
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
     name: str
     email: EmailStr = Field(index=True)
