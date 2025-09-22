@@ -8,6 +8,14 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
 
+class Token (BaseModel):
+    access_token: str
+    token_type: str
+
+class Login(BaseModel):
+    email: str
+    password: str
+
 class Operation(BaseModel):
     amount: float
     operationType: str
@@ -29,7 +37,6 @@ class OperationInDB(SQLModel, table=True):
     user: Optional["UserInDB"] = Relationship(back_populates="historic") #estabelecendo uma conexão e não será uma tabela no DB
 
 class UserInDB(SQLModel, table=True):
-    
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
     name: str
     email: EmailStr = Field(index=True)
