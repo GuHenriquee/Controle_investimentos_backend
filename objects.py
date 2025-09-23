@@ -12,6 +12,9 @@ class Token (BaseModel):
     access_token: str
     token_type: str
 
+class TokenData(BaseModel):
+    username: str | None = None
+
 class Login(BaseModel):
     email: str
     password: str
@@ -42,7 +45,9 @@ class UserInDB(SQLModel, table=True):
     email: EmailStr = Field(index=True)
     password: str
     patrimony: float = Field(default=0.0)
+    disabled: bool = Field(default=False)
     historic: List["OperationInDB"] = Relationship(back_populates="user") #estabelecendo uma conexão
+
 
 # Modelo SÓ PARA A RESPOSTA, sem a senha
 class UserResponse(BaseModel):
