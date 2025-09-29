@@ -22,7 +22,6 @@ class Login(BaseModel):
 class Operation(BaseModel):
     amount: float
     operationType: str
-    previousValue: float 
 
 class OperationResponse(BaseModel):
     amount: float
@@ -54,4 +53,5 @@ class UserResponse(BaseModel):
     name: str
     email: EmailStr
     patrimony: float
+
 
