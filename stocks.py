@@ -1,17 +1,17 @@
 import json
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 import websockets
 from ignore import Gitignore
 
-app = FastAPI()
+# 1. Em vez de 'FastAPI()', criamos um 'APIRouter()'
+router = APIRouter()
 
-# A URL agora inclui um parâmetro de caminho para os tickers
-@app.websocket("/ws/realtimestocks/{tickers}")
+# 2. Usamos o decorador '@router.websocket' em vez de '@app.websocket'
+@router.websocket("/ws/realtimestocks/{tickers}")
 async def websocket_realtimestocks_proxy(client_websocket: WebSocket, tickers: str):
-
+  
     await client_websocket.accept()
     
-    # Transforma a string "PETR4.SA,VALE3.SA" em uma lista ["PETR4.SA", "VALE3.SA"]
     stocks_to_subscribe = [stock.strip() for stock in tickers.split(',')]
     
     finnhub_uri = f"wss://ws.finnhub.io?token={Gitignore.FINNHUB_API_KEY}"

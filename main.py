@@ -10,7 +10,7 @@ from sqlmodel import select
 from login import LoginAndJWT
 from typing import Annotated
 from login import LoginAndJWT
-
+import stocks 
 
 
 @asynccontextmanager
@@ -19,6 +19,8 @@ async def lifespan(app: FastAPI):
     yield
     
 app = FastAPI(lifespan=lifespan)
+
+app.include_router(stocks.router)
 
 
 
