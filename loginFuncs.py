@@ -5,13 +5,11 @@ from ignore import Gitignore
 import jwt
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from typing import Dict, Any
 from sqlmodel import Session, select
 from database import database
-
-
 
 
 ALGORITHM = "HS256"
@@ -39,18 +37,13 @@ class LoginAndJWT():
 
         encoded_jwt = jwt.encode(to_encode, Gitignore.SECRET_KEY, algorithm=ALGORITHM) #"jwt.encode" Retorna um Token
         return encoded_jwt
-    
-
-
 
     # PART 2
 
     def get_user(username: str, session: Session):
         query = select(UserInDB).where(UserInDB.email == username)
         user = session.exec(query).first()
-        return user
-    
-
+        return user 
 
     async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: database.SessionDep ):
 
@@ -60,14 +53,14 @@ class LoginAndJWT():
             headers={"WWW-Authenticate": "Bearer"},
         )
         try:
-            payload: Dict[str, Any] = jwt.decode(token, Gitignore.SECRET_KEY, algorithms=[ALGORITHM])
-            username = payload.get("sub")
+            payload: Dict[str, Any] = jwt.decode(token, Gitignore.SECRET_KEY, algorithms=[ALGORITHM]) # Decodifica o jwt 
+            username = payload.get("sub") # retorna o email passado
             if username is None:
                 raise credentials_exception
             token_data = TokenData(username=username)
         except InvalidTokenError:
             raise credentials_exception
-        user = LoginAndJWT.get_user(username=token_data.username, session=session)
+        user = LoginAndJWT.get_user(username=token_data.username, session=session) #Pega o usuário pelo email
         if user is None:
             raise credentials_exception
         return user
