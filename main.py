@@ -4,7 +4,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from database import database
 from contextlib import asynccontextmanager
 from ignore import Gitignore
-from routers import createUser, login, operation, stocks, crypto
+from routers import createUser, login, operation, stocks, crypto, shoping
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -32,6 +32,7 @@ app.include_router(login.router)
 app.include_router(operation.router)
 app.include_router(stocks.router)
 app.include_router(crypto.router)
+app.include_router(shoping.router)
 
 
 

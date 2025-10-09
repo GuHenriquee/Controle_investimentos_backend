@@ -4,3 +4,4 @@ class Operations:
         return current + amount
     def minus(current, amount):
         return current - amount
+ 

@@ -2,6 +2,7 @@ from fastapi import WebSocket, WebSocketDisconnect, APIRouter
 import json
 import websockets
 
+
 router = APIRouter()
 
 @router.websocket("/ws/{criptos}/{coin}")
