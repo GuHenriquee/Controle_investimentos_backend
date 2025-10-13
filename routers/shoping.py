@@ -1,4 +1,4 @@
-from objects import Shopping, shopsName, UserInDB, ShoppingResponse
+from backend.objects.shoppingOB import Shopping, shopsName, UserInDB, ShoppingResponse
 from loginFuncs import LoginAndJWT
 from database import database
 from fastapi import APIRouter, Depends, HTTPException
@@ -18,7 +18,7 @@ async def cripto_operations(
 
     try:
         async with websockets.connect(final_link, open_timeout=5) as binance_websocket: 
-            print("DEBUG: Conexão com WebSocket estabelecida. Aguardando mensagem...")
+            print("DEBUG: Conexão com Binance WebSocket estabelecida. Aguardando mensagem...")
             binance_data = await binance_websocket.recv()
             print("DEBUG: Mensagem recebida!")
     except Exception as e:

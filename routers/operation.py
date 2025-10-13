@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from objects import Operation, OperationInDB, UserInDB, OperationResponse
+from backend.objects.operationOB import Operation, OperationInDB, UserInDB, OperationResponse
 from database import database
 from operations import Operations
 from typing import Annotated

@@ -3,10 +3,8 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 import websockets
 from ignore import Gitignore
 
-# 1. Em vez de 'FastAPI()', criamos um 'APIRouter()'
 router = APIRouter()
 
-# 2. Usamos o decorador '@router.websocket' em vez de '@app.websocket'
 @router.websocket("/ws/realtimestocks/{tickers}")
 async def websocket_realtimestocks_proxy(client_websocket: WebSocket, tickers: str):
   
