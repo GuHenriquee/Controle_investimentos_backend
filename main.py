@@ -8,16 +8,20 @@ from ignore import Gitignore
 from routers import createUser, login, operation, stocks, crypto, shoping
 from apscheduler.schedulers.background import BackgroundScheduler
 from scheduler import update_criptos_db
+from coingekoData import update_criptos_db_if_needed
 
 scheduler = BackgroundScheduler(timezone="America/Sao_Paulo")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    database.create_db_and_tables()
-    print("Iniciando o servidor e o agendador de tarefas...")
-    
-    scheduler.add_job(update_criptos_db, 'interval', hours=24, id="update_assets_24h")  # Função 'update_criptos_db' sera executada a cada 24 horas
+    print("Executando verificação inicial de ativos...")
+    update_criptos_db_if_needed()
 
+    print("Estabelecendo conexão com banco de dados...")
+    database.create_db_and_tables()
+
+    print("Iniciando o servidor e o agendador de tarefas...")
+    scheduler.add_job(update_criptos_db, 'interval', hours=24, id="update_assets_24h")  # Função 'update_criptos_db' sera executada a cada 24 horas
     scheduler.start()
 
     yield

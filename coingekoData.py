@@ -1,6 +1,11 @@
 from pycoingecko import CoinGeckoAPI
+from sqlmodel import Session, select
+from datetime import datetime, timedelta, timezone
+from database import database
+from objects.criptoOB import CriptoProfile
 
 cg = CoinGeckoAPI()
+
 def get_cripto_data(coin_id: str):
 
     try:
@@ -30,3 +35,46 @@ def get_cripto_data(coin_id: str):
     except Exception as e:
         print(f"Erro ao buscar perfil para '{coin_id}': {e}")
         return None
+    
+
+def update_criptos_db_if_needed():
+    
+    print(f"[{datetime.now()}] INICIANDO VERIFICAÇÃO DE ATIVOS DESATUALIZADOS...")
+    
+    with Session(database.engine) as session:
+        statement = select(CriptoProfile)
+        criptos_in_db = session.exec(statement).all()
+        
+        updated_count = 0
+        failed_count = 0
+        
+        twenty_four_hours_ago = datetime.now(timezone.utc) - timedelta(hours=24)
+
+#Objetos datetime, o símbolo < não significa "menor" no sentido numérico, mas sim "anterior no tempo" ou "aconteceu antes de".
+        for cripto in criptos_in_db:
+            if cripto.last_updated.replace(tzinfo=timezone.utc) < twenty_four_hours_ago: #"tzinfo" timezone info
+                print(f"  - Ativo '{cripto.id}' está desatualizado. Atualizando...")
+                try:
+                    # O resto da sua lógica permanece o mesmo
+                    fresh_data = get_cripto_data(cripto.id)
+                    
+                    if fresh_data:
+                        cripto.description = fresh_data.get("description")
+                        cripto.website = fresh_data.get("website")
+                        cripto.market_cap_rank = fresh_data.get("market_cap_rank")
+                        cripto.last_updated = datetime.now(timezone.utc) 
+                        
+                        session.add(cripto)
+                        updated_count += 1
+                    else:
+                        failed_count += 1
+
+                except Exception as e:
+                    failed_count += 1
+                    print(f"  - ERRO ao processar '{cripto.id}': {e}")
+
+        if updated_count > 0:
+            print(f"Salvando {updated_count} atualizações no banco de dados...")
+            session.commit()
+
+    print(f"[{datetime.now()}] VERIFICAÇÃO CONCLUÍDA: {updated_count} atualizados, {failed_count} falhas.")
