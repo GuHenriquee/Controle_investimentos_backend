@@ -1,4 +1,4 @@
-from backend.objects.userOB import UserInDB, UserCreate, UserResponse
+from objects.userOB import UserInDB, UserCreate, UserResponse
 from database import database
 from sqlmodel import select
 from fastapi import HTTPException, APIRouter

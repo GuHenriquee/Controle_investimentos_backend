@@ -1,4 +1,4 @@
-from objects import UserInDB, TokenData
+from objects.userOB import UserInDB, TokenData
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from ignore import Gitignore

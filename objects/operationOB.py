@@ -2,7 +2,6 @@ from typing import Optional
 from pydantic import BaseModel
 from uuid import UUID
 from sqlmodel import Relationship, SQLModel, Field
-from userOB import UserInDB
 
 class Operation(BaseModel):
     amount: float
@@ -21,4 +20,4 @@ class OperationInDB(SQLModel, table=True):
     previousValue: float
     newValue: float
     user_id: Optional[UUID] = Field(default=None, foreign_key="userindb.id")
-    user: Optional["UserInDB"] = Relationship(back_populates="historic") #estabelecendo uma conexão e não será uma tabela no DB
+    user: Optional["UserInDB"] = Relationship(back_populates="historic") # type: ignore

@@ -1,4 +1,5 @@
-from backend.objects.shoppingOB import Shopping, shopsName, UserInDB, ShoppingResponse
+from objects.shoppingOB import Shopping, shopsName, ShoppingResponse
+from objects.userOB import UserInDB
 from loginFuncs import LoginAndJWT
 from database import database
 from fastapi import APIRouter, Depends, HTTPException

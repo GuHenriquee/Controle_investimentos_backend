@@ -3,7 +3,6 @@ from pydantic import BaseModel, ConfigDict
 from uuid import UUID, uuid4
 from sqlmodel import Relationship, SQLModel, Field
 from datetime import datetime, timezone
-from userOB import UserInDB
 
 class shopsName(BaseModel):
     type: str

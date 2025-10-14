@@ -2,8 +2,6 @@ from typing import List
 from pydantic import BaseModel, EmailStr
 from uuid import UUID, uuid4
 from sqlmodel import Relationship, SQLModel, Field
-from shoppingOB import Shopping
-from operationOB import OperationInDB
 
 class UserCreate(BaseModel):
     name: str
@@ -33,5 +31,5 @@ class UserInDB(SQLModel, table=True):
     password: str
     patrimony: float = Field(default=0.0)
     disabled: bool = Field(default=False)
-    historic: List["OperationInDB"] = Relationship(back_populates="user") #estabelecendo uma conexão
-    bought: List["Shopping"] = Relationship(back_populates="user")
+    historic: List["OperationInDB"] = Relationship(back_populates="user") # type: ignore #estabelecendo uma conexão
+    bought: List["Shopping"] = Relationship(back_populates="user") # type: ignore
