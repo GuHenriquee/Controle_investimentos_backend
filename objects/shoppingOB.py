@@ -19,7 +19,7 @@ class Shopping(SQLModel,table =True):
     amount: float
     quantity: float
     user_id: Optional[UUID] = Field(default=None, foreign_key="userindb.id")
-    user: Optional["UserInDB"] = Relationship(back_populates="bought") 
+    user: Optional["UserInDB"] = Relationship(back_populates="bought")  # type: ignore
 
 class ShoppingResponse(BaseModel):
         type:str

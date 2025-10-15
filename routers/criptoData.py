@@ -11,24 +11,21 @@ from coingekoData import get_cripto_data
 
 router = APIRouter()
 
-@router.post("/assets/add", response_model=CriptoResponse, status_code=201)
+@router.post("/assets/add", status_code=201)
 def add_new_cripto_to_monitor(name: CriptoRequest, session: database.SessionDep, 
                              current_user: Annotated[UserInDB, Depends(LoginAndJWT.get_current_active_user)]) -> CriptoProfile:
    
-    coin_id = name.coin_id.lower()
+    coin_id = name.coin_id
     print(f"Usuário '{current_user.name}' solicitou adicionar o ativo: {coin_id}")
 
-    # 1. Verifica se o ativo já existe no banco de dados para evitar duplicatas
     existing_profile = session.get(CriptoProfile, coin_id)
     if existing_profile:
         raise HTTPException(status_code=409, detail=f"Ativo '{coin_id}' já está sendo monitorado.")
 
-    # 2. Busca os dados do perfil na API da CoinGecko
     new_profile_data = get_cripto_data(coin_id)
     if not new_profile_data:
         raise HTTPException(status_code=404, detail=f"Não foi possível encontrar o ativo '{coin_id}' na CoinGecko.")
 
-    # 3. Cria um novo objeto AssetProfile com os dados obtidos
     new_asset = CriptoProfile(
         id=new_profile_data["id"],
         symbol=new_profile_data["symbol"],
@@ -41,7 +38,6 @@ def add_new_cripto_to_monitor(name: CriptoRequest, session: database.SessionDep,
         last_updated=datetime.now(timezone.utc)
     )
 
-    # 4. Salva o novo ativo no banco de dados
     session.add(new_asset)
     session.commit()
     session.refresh(new_asset)

@@ -5,7 +5,7 @@ from routers import criptoData
 from database import database
 from contextlib import asynccontextmanager
 from ignore import Gitignore
-from routers import createUser, login, operation, stocks, crypto, shoping
+from routers import createUser, login, operation, stocks, crypto, shoping, osintAnalises
 from apscheduler.schedulers.background import BackgroundScheduler
 from scheduler import update_criptos_db
 from coingekoData import update_criptos_db_if_needed
@@ -51,6 +51,7 @@ app.include_router(stocks.router)
 app.include_router(crypto.router)
 app.include_router(shoping.router)
 app.include_router(criptoData.router)
+app.include_router(osintAnalises.router)
 
 
 

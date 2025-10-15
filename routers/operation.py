@@ -20,11 +20,11 @@ def operator(operation: Operation, session: database.SessionDep,
             result = Operations.sum(current_user.patrimony, operation.amount)
 
     lastOperation = OperationInDB(
-        user_id= current_user.id,
         amount = operation.amount,
         operationType = operation.operationType,
         previousValue = current_user.patrimony,
-        newValue= result
+        newValue= result,
+        user_id= current_user.id
     )
 
     current_user.patrimony = lastOperation.newValue
