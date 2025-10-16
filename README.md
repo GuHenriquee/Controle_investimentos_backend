@@ -78,9 +78,3 @@ graph TD
 * [ ] **Frontend:** Desenvolver uma interface web com dashboards interativos usando React ou Vue.js.
 
 ---
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
-
----
