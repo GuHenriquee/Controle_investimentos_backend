@@ -9,7 +9,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from typing import Dict, Any
 from sqlmodel import Session, select
-from database import database
+from funcionalities.APIs.database import database
 
 
 ALGORITHM = "HS256"

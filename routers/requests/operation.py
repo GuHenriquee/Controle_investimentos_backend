@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 from objects.operationOB import Operation, OperationInDB, OperationResponse
 from objects.userOB import UserInDB
-from database import database
-from operations import Operations
+from funcionalities.APIs.database import database
+from funcionalities.requestsFuncs.operations import Operations
 from typing import Annotated
-from loginFuncs import LoginAndJWT
+from funcionalities.requestsFuncs.loginFuncs import LoginAndJWT
 
 router = APIRouter()
 

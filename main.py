@@ -1,21 +1,22 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from routers import criptoData
-from database import database
+from routers.requests import createUser, login, operation, shoping
+from routers.frontData import crypto, stocks
+from routers.admin import criptoData, osintAnalises
+from funcionalities.APIs.database import database
 from contextlib import asynccontextmanager
 from ignore import Gitignore
-from routers import createUser, login, operation, stocks, crypto, shoping, osintAnalises
 from apscheduler.schedulers.background import BackgroundScheduler
-from scheduler import update_criptos_db
-from coingekoData import update_criptos_db_if_needed
+from funcionalities.requestsFuncs.scheduler import update_criptos_db
+from funcionalities.APIs.coingekoData import CoingekoFuncions
 
 scheduler = BackgroundScheduler(timezone="America/Sao_Paulo")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Executando verificação inicial de ativos...")
-    update_criptos_db_if_needed()
+    CoingekoFuncions.update_criptos_db_if_needed()
 
     print("Estabelecendo conexão com banco de dados...")
     database.create_db_and_tables()

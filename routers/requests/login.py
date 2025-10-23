@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from objects.userOB import Login, Token, UserInDB
-from database import database
+from funcionalities.APIs.database import database
 from sqlmodel import select
-from loginFuncs import LoginAndJWT
+from funcionalities.requestsFuncs.loginFuncs import LoginAndJWT
 
 router = APIRouter()
 

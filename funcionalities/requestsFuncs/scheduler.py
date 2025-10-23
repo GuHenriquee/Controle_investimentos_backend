@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
 from sqlmodel import select, Session
-from database import database
+from funcionalities.APIs.database import database
 from objects.criptoOB import CriptoProfile # Importe os novos modelos
-from coingekoData import get_cripto_data
+from funcionalities.APIs.coingekoData import CoingekoFuncions
 
 def update_criptos_db():
 
@@ -23,7 +23,7 @@ def update_criptos_db():
                 if not cripto_to_update:
                     continue # Pula caso o ativo tenha sido deletado durante a execução
 
-                fresh_data = get_cripto_data(coin_id)
+                fresh_data = CoingekoFuncions.get_cripto_data(coin_id)
                 
                 if fresh_data:
                     cripto_to_update.description = fresh_data.get("description")

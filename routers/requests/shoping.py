@@ -1,7 +1,7 @@
 from objects.shoppingOB import Shopping, shopsName, ShoppingResponse
 from objects.userOB import UserInDB
-from loginFuncs import LoginAndJWT
-from database import database
+from funcionalities.requestsFuncs.loginFuncs import LoginAndJWT
+from funcionalities.APIs.database import database
 from fastapi import APIRouter, Depends, HTTPException
 from typing import Annotated
 import json

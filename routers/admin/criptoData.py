@@ -1,12 +1,11 @@
 from datetime import datetime, timezone
 from typing import Annotated
-from sqlmodel import select, Session
 from fastapi import APIRouter, Depends, HTTPException
-from database import database
-from objects.criptoOB import CriptoResponse, CriptoRequest, CriptoProfile # Importe os novos modelos
+from funcionalities.APIs.database import database
+from objects.criptoOB import CriptoRequest, CriptoProfile # Importe os novos modelos
 from objects.userOB import UserInDB 
-from loginFuncs import LoginAndJWT
-from coingekoData import get_cripto_data
+from funcionalities.requestsFuncs.loginFuncs import LoginAndJWT
+from funcionalities.APIs.coingekoData import CoingekoFuncions
 
 
 router = APIRouter()
@@ -22,7 +21,7 @@ def add_new_cripto_to_monitor(name: CriptoRequest, session: database.SessionDep,
     if existing_profile:
         raise HTTPException(status_code=409, detail=f"Ativo '{coin_id}' já está sendo monitorado.")
 
-    new_profile_data = get_cripto_data(coin_id)
+    new_profile_data = CoingekoFuncions.get_cripto_data(coin_id)
     if not new_profile_data:
         raise HTTPException(status_code=404, detail=f"Não foi possível encontrar o ativo '{coin_id}' na CoinGecko.")
 
