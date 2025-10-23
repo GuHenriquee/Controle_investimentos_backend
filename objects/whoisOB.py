@@ -6,7 +6,7 @@ from datetime import datetime
 class Cripto(BaseModel):
     name: str
 
-class WhoisOsintProfile(SQLModel, table=True):
+class Whois(SQLModel, table=True):
     id: str = Field(default=None, foreign_key="criptoprofile.id", primary_key=True)
     age_in_days: Optional[int] = None
     creation_date: Optional[datetime] = None

@@ -1,6 +1,6 @@
 import whois
 from datetime import datetime, timezone
-from objects.whoisOB import WhoisOsintProfile
+from objects.whoisOB import Whois
 
 def analyze_and_create_whois_profile(cripto_id: str, domain: str):
     try:
@@ -14,10 +14,10 @@ def analyze_and_create_whois_profile(cripto_id: str, domain: str):
         expiration_date_raw = informacoes.expiration_date
         expiration_date_clean = expiration_date_raw[0] if isinstance(expiration_date_raw, list) else expiration_date_raw
 
-        # 3. Registrar
+        # 3. A empresa que foi usada para comprar o domínio
         registrar_clean = informacoes.registrar
 
-        # 4. Contato Público (Lógica que faltava)
+        # 4. Contato Público
         emails_raw = informacoes.emails
         has_public_contact_clean = bool(emails_raw and isinstance(emails_raw, list) and len(emails_raw) > 0)
 
@@ -28,10 +28,9 @@ def analyze_and_create_whois_profile(cripto_id: str, domain: str):
             now_aware = datetime.now(timezone.utc)
             age_in_days_clean = (now_aware - creation_date_aware).days
 
-        # --- Criação do Objeto ---
 
-        osint_profile = WhoisOsintProfile(
-            id=cripto_id,  # O ID da cripto, essencial para o relacionamento!
+        osint_profile = Whois(
+            id=cripto_id,  
             age_in_days=age_in_days_clean,
             creation_date=creation_date_clean,
             expiration_date=expiration_date_clean,
