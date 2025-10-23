@@ -31,6 +31,4 @@ def githubAnalise(cripto_id: str, url: str)->Git | None :
         return None    
 
 
-urls = "https://github.com/ethereum/go-ethereum"
-githubAnalise(urls)
         

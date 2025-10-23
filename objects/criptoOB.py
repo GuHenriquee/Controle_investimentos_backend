@@ -28,5 +28,7 @@ class CriptoProfile(SQLModel, table=True):
     github_repo: Optional[str] = None
     market_cap_rank: Optional[int] = None
     last_updated: datetime
-    osint_profile: Optional["WhoisOsintProfile"] = Relationship(back_populates="cripto_profile") # type: ignore
+    whois_profile: "Whois" = Relationship(back_populates="cripto_profile") # type: ignore
+    git_profile: "Git" = Relationship(back_populates="cripto_profile") # type: ignore
+
     

@@ -13,4 +13,4 @@ class Whois(SQLModel, table=True):
     expiration_date: Optional[datetime] = None
     registrar: Optional[str] = None 
     has_public_contact: bool
-    cripto_profile: "CriptoProfile" = Relationship(back_populates="osint_profile") # type: ignore
+    cripto_profile: "CriptoProfile" = Relationship(back_populates="whois_profile") # type: ignore
