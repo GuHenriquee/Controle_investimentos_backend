@@ -5,11 +5,10 @@ from urllib.parse import urljoin, urlparse
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def find_rss_feed_selenium(base_url: str) -> str | None:
+def find_blog(base_url: str) -> str | None:
 
     print(f"Iniciando busca com Selenium para: {base_url}")
     
-    # --- ETAPA 1: "Tentativa Fácil" (Igual) ---
     parsed_url = urlparse(base_url)
     domain = parsed_url.netloc
 
@@ -23,7 +22,6 @@ def find_rss_feed_selenium(base_url: str) -> str | None:
         print(f"Site é Substack. Tentando URL: {feed_url}")
         return feed_url
 
-    # --- ETAPA 2: Investigação com Selenium (O Navegador Robô) ---
     
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")                          # Faça tudo em segundo plano
@@ -38,12 +36,10 @@ def find_rss_feed_selenium(base_url: str) -> str | None:
         print("Aguardando Pista 1 (Padrão Ouro) carregar (até 10s)...")
         wait = WebDriverWait(driver, 10)                        # Cria um "vigia" que espera no máximo 10 segundos
         
-        # Diz ao "vigia" para esperar até que o elemento que queremos EXISTA na página
         rss_link_tag = wait.until(
             EC.presence_of_element_located((
                 By.CSS_SELECTOR, 'link[rel="alternate"][type="application/rss+xml"]')))
         
-        # Se a linha de cima NÃO deu erro, o elemento foi encontrado!
         feed_url = rss_link_tag.get_attribute('href')
         if feed_url:
             print(f"Pista 1 (Padrão Ouro) encontrada: {feed_url}")
@@ -77,9 +73,3 @@ def find_rss_feed_selenium(base_url: str) -> str | None:
     print(f"Nenhum feed RSS encontrado para {base_url}.")
     return None
 
-if __name__ == "__main__":
-    link_sol = find_rss_feed_selenium("https://solana.com/")
-    print(f"Resultado Solana: {link_sol}\n") 
-
-    link_eth = find_rss_feed_selenium("https://blog.ethereum.org/")
-    print(f"Resultado Ethereum: {link_eth}\n")

@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
-from sqlmodel import SQLModel, Field
+from sqlalchemy import String
+from sqlmodel import Column, SQLModel, Field, Relationship
 
 
 class OsintData(SQLModel, table=True):
@@ -21,3 +22,11 @@ class AiInsight(SQLModel, table=True):
     keywords: str        # ex: "parceria,SEC,hack,mainnet"
     source_data_id: int = Field(foreign_key="osintdata.id") # Link para o dado bruto
     processed_at: datetime = Field(default_factory=...)
+
+class OficialData(SQLModel, table=True):
+    link: str = Field(primary_key=True) 
+    title: str
+    date: datetime
+    summary: str = Field(sa_column=Column(String(2000))) 
+    cripto_id: str = Field(foreign_key="criptoprofile.id", index=True)
+    cripto_profile: "CriptoProfile" = Relationship(back_populates="oficial_data") # type: ignore

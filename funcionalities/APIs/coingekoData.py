@@ -42,7 +42,7 @@ class CoingekoFuncions():
         
         print(f"[{datetime.now()}] INICIANDO VERIFICAÇÃO DE ATIVOS DESATUALIZADOS...")
         
-        with Session(database.engine) as session:
+        with database.SessionLocal() as session:
             statement = select(CriptoProfile)
             criptos_in_db = session.exec(statement).all()
             

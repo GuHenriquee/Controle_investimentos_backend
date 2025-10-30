@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from funcionalities.APIs.database import database
 from objects.criptoOB import CriptoRequest, CriptoProfile # Importe os novos modelos
 from objects.userOB import UserInDB 
@@ -11,7 +11,7 @@ from funcionalities.APIs.coingekoData import CoingekoFuncions
 router = APIRouter()
 
 @router.post("/assets/add", status_code=201)
-def add_new_cripto_to_monitor(name: CriptoRequest, session: database.SessionDep, 
+def add_new_cripto_to_monitor(name: CriptoRequest, session: database.SessionDep, backGroundTask: BackgroundTasks,
                              current_user: Annotated[UserInDB, Depends(LoginAndJWT.get_current_active_user)]) -> CriptoProfile:
    
     coin_id = name.coin_id
@@ -25,7 +25,7 @@ def add_new_cripto_to_monitor(name: CriptoRequest, session: database.SessionDep,
     if not new_profile_data:
         raise HTTPException(status_code=404, detail=f"Não foi possível encontrar o ativo '{coin_id}' na CoinGecko.")
 
-    new_asset = CriptoProfile(
+    new_cripto = CriptoProfile(
         id=new_profile_data["id"],
         symbol=new_profile_data["symbol"],
         description=new_profile_data["description"],
@@ -37,13 +37,13 @@ def add_new_cripto_to_monitor(name: CriptoRequest, session: database.SessionDep,
         last_updated=datetime.now(timezone.utc)
     )
 
-    session.add(new_asset)
+    session.add(new_cripto)
     session.commit()
-    session.refresh(new_asset)
+    session.refresh(new_cripto)
 
     print(f"Ativo '{coin_id}' adicionado com sucesso ao banco de dados.")
     
-    return new_asset
+    return new_cripto
 
 
 
