@@ -1,19 +1,15 @@
 from models.shopping_cryptos import Shopping
 from schemas.shopping_cryptos import shopsName, ShoppingResponse
-from models.user import UserInDB
-from services.login_service import LoginAndJWT
-from core.database import database
-from fastapi import APIRouter, Depends, HTTPException
-from typing import Annotated
+from fastapi import APIRouter, HTTPException
 import json
 import websockets
 from sqlmodel import select
+from api.deps import SessionDep, CurrentUser
 
 router = APIRouter()
 
 @router.post("/sellOrBuy", response_model=ShoppingResponse)
-async def cripto_operations(
-    current_user: Annotated[UserInDB, Depends(LoginAndJWT.get_current_active_user)], session: database.SessionDep, coin: shopsName) -> ShoppingResponse:
+async def cripto_operations(current_user: CurrentUser, session: SessionDep, coin: shopsName) -> ShoppingResponse:
 
     final_link = f"wss://stream.binance.com:9443/stream?streams={coin.name.lower()}usdt@miniTicker"
     print(f"DEBUG: URL de conexão: {final_link}")

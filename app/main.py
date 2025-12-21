@@ -1,12 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from routers import create_user, cripto_data
-from routers import crypto, login, operation
 from services.blog_data_catcher import blog_catcher_worker
-from routers import shoping
-from routers import stocks
-from routers import osint_analises
 from core.database import database 
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -14,9 +9,9 @@ from services.scheduler import update_criptos_db
 from services.coingeko_data import CoingekoFuncions
 from sqlmodel import SQLModel 
 from core.config import settings
+from api.v1.api import api_router
 
 scheduler = BackgroundScheduler(timezone="America/Sao_Paulo")
-
 
 def create_db_and_tables():
     print("Iniciando criação de tabelas (se não existirem)...")
@@ -54,12 +49,4 @@ app.add_middleware(
     allowed_hosts=["localhost", "127.0.0.1"]
 )
 
-# ... (seus 'include_router') ...
-app.include_router(create_user.router)
-app.include_router(login.router)
-app.include_router(operation.router)
-app.include_router(stocks.router)
-app.include_router(crypto.router)
-app.include_router(shoping.router)
-app.include_router(cripto_data.router)
-app.include_router(osint_analises.router)
+app.include_router(api_router, prefix="/api/v1")

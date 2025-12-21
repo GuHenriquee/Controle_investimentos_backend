@@ -1,14 +1,14 @@
 from fastapi import APIRouter, HTTPException
 from models.user import UserInDB
 from schemas.user import Login, Token  
-from core.database import database
 from sqlmodel import select
 from services.login_service import LoginAndJWT
+from api.deps import SessionDep
 
 router = APIRouter()
 
 @router.post("/api/login/", status_code=200)
-def isLoged(loginCredentiasl: Login, session: database.SessionDep)-> Token:
+def isLoged(loginCredentiasl: Login, session: SessionDep)-> Token:
 
     queryEmail = select(UserInDB).where(UserInDB.email == loginCredentiasl.email)
     existingUser = session.exec(queryEmail).first()

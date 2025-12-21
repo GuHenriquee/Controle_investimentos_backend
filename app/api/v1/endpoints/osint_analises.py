@@ -5,13 +5,12 @@ from models.git import Git
 from schemas.analise import AnalysisResponse
 from schemas.cripto import CriptoSearch
 from services.osint_annalist import PrimaryAnalysis 
-from core.database import database
-
+from api.deps import SessionDep
 
 router = APIRouter()
 
 @router.post("/api/osint/run-and-save-analysis/", response_model=AnalysisResponse, status_code=200)
-def run_and_save_analysis(cripto: CriptoSearch, session: database.SessionDep):
+def run_and_save_analysis(cripto: CriptoSearch, session: SessionDep):
 
     cripto_profile_from_db = session.get(CriptoProfile, cripto.name)
     if not cripto_profile_from_db:

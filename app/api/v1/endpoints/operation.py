@@ -1,17 +1,14 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from models.operations import OperationInDB
 from schemas.operations import Operation, OperationResponse
-from models.user import UserInDB
-from core.database import database
 from services.operations_service import Operations
-from typing import Annotated
-from services.login_service import LoginAndJWT
+from api.deps import SessionDep, CurrentUser
 
 router = APIRouter()
 
 @router.post("/api/operation/", status_code=201)
-def operator(operation: Operation, session: database.SessionDep, 
-             current_user: Annotated[UserInDB, Depends(LoginAndJWT.get_current_active_user)])-> OperationResponse:
+def operator(operation: Operation, session: SessionDep, 
+             current_user: CurrentUser)-> OperationResponse:
     
 
     if (operation):
