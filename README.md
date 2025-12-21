@@ -1,3 +1,27 @@
+## 📂 Arquitetura do Projeto
+
+O projeto segue uma arquitetura modular baseada nas melhores práticas do **FastAPI**, visando escalabilidade, fácil manutenção e separação de responsabilidades.
+
+### Estrutura de Pastas
+
+```text
+backend/
+├── app/
+│   ├── api/
+│   │   ├── deps.py          # Dependências injetáveis (DB Session, User Auth)
+│   │   └── v1/              # Versionamento da API
+│   │       ├── api.py       # Roteador central (Central Hub)
+│   │       └── endpoints/   # Controladores de rotas (Auth, Users, Criptos, Stocks)
+│   ├── core/
+│   │   ├── config.py        # Validação de variáveis de ambiente (Pydantic Settings)
+│   │   └── database.py      # Configuração e conexão com o Banco de Dados
+│   ├── models/              # Modelos do Banco de Dados (SQLModel/ORM)
+│   ├── schemas/             # Modelos de Validação/Resposta (Pydantic)
+│   ├── services/            # Lógica de Negócio e APIs externas (CoinGecko, Scrapers)
+│   └── main.py              # Ponto de entrada da aplicação
+├── .env                     # Variáveis de ambiente (não versionado)
+└── .gitignore
+
 # Projeto de Controle de Investimentos com Inteligência OSINT & IA
 
 Este não é apenas um sistema de controle de portfólio. É uma plataforma de inteligência de investimentos projetada para ir além do simples rastreamento de ativos, utilizando técnicas de **Open Source Intelligence (OSINT)** e **Análise por Inteligência Artificial** para gerar insights valiosos sobre criptomoedas e, futuramente, outros ativos.
