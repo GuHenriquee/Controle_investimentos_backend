@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from models.cripto import CriptoProfile # Importe os novos modelos
 from schemas.cripto import CriptoRequest
 from services.coingeko_data import CoingekoFuncions
-from api.deps import SessionDep
+from api.deps import SessionDep, addToDB
 
 router = APIRouter()
 
@@ -32,9 +32,8 @@ def add_new_cripto_to_monitor(name: CriptoRequest, session: SessionDep ) -> Crip
         last_updated=datetime.now(timezone.utc)
     )
 
-    session.add(new_cripto)
-    session.commit()
-    session.refresh(new_cripto)
+    addToDB(new_cripto, session)
+    
 
     print(f"Ativo '{coin_id}' adicionado com sucesso ao banco de dados.")
     

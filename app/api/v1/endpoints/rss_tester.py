@@ -11,6 +11,7 @@ def create_user(cripto_id: str, feed_url: str, session: SessionDep):
     posts = find_official_data(cripto_id, feed_url)
 
     saved_count = 0
+    existing_post = ""
     
     for post in posts:
         existing_post = session.get(OficialData, post.link)

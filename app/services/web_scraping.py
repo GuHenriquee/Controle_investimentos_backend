@@ -1,75 +1,97 @@
+from typing import Optional
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
 from urllib.parse import urljoin, urlparse
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def find_blog(base_url: str) -> str | None:
+def find_blog(base_url: str) -> Optional[str]:
 
-    print(f"Iniciando busca com Selenium para: {base_url}")
+    print(f"🕵️‍♂️ Iniciando detetive Selenium em: {base_url}")
     
     parsed_url = urlparse(base_url)
     domain = parsed_url.netloc
 
+    # --- Atalhos Rápidos (Evita abrir o Chrome se não precisar) ---
     if "medium.com" in domain:
-        feed_url = f"{parsed_url.scheme}://{domain}/feed{parsed_url.path}"
-        print(f"Site é Medium. Tentando URL: {feed_url}")
-        return feed_url
-
-    if "substack.com" in domain:
-        feed_url = f"{base_url.rstrip('/')}/feed"
-        print(f"Site é Substack. Tentando URL: {feed_url}")
-        return feed_url
-
+        return f"{parsed_url.scheme}://{domain}/feed{parsed_url.path}"
     
+    if "substack.com" in domain:
+        return f"{base_url.rstrip('/')}/feed"
+
+    # --- Configuração do Chrome (Blindado para Servidor) ---
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")                          # Faça tudo em segundo plano
-    options.add_argument("--log-level=3")                       # Não poluir seu terminal com mensagens de status inúteis
-    options.add_argument("accept-language=en-US,en;q=0.9")      # Site em Inglês (mais provável de ter o RSS)
+    options.add_argument("--headless") 
+    options.add_argument("--no-sandbox") # CRÍTICO para Docker/Linux
+    options.add_argument("--disable-dev-shm-usage") # CRÍTICO para memória
+    options.add_argument("--log-level=3")
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+    
     driver = None
     
     try:
         driver = webdriver.Chrome(options=options) 
+        driver.set_page_load_timeout(15) # Não deixa travar eternamente
         driver.get(base_url)
 
-        print("Aguardando Pista 1 (Padrão Ouro) carregar (até 10s)...")
-        wait = WebDriverWait(driver, 10)                        # Cria um "vigia" que espera no máximo 10 segundos
-        
-        rss_link_tag = wait.until(
-            EC.presence_of_element_located((
-                By.CSS_SELECTOR, 'link[rel="alternate"][type="application/rss+xml"]')))
-        
-        feed_url = rss_link_tag.get_attribute('href')
-        if feed_url:
-            print(f"Pista 1 (Padrão Ouro) encontrada: {feed_url}")
-            return urljoin(base_url, feed_url)
+        # --- Pista 1: O Padrão Ouro (<link type="application/rss+xml">) ---
+        print("🔍 Procurando meta tag RSS (Padrão Ouro)...")
+        try:
+            wait = WebDriverWait(driver, 5) # 5s é suficiente
+            rss_link_tag = wait.until(
+                EC.presence_of_element_located((
+                    By.CSS_SELECTOR, 'link[rel="alternate"][type="application/rss+xml"]'
+                ))
+            )
+            feed_url = rss_link_tag.get_attribute('href')
+            if feed_url:
+                print(f"✅ ACHOU (Meta Tag): {feed_url}")
+                return urljoin(base_url, feed_url)
+        except TimeoutException:
+            print("❌ Meta tag não encontrada.")
 
-    except TimeoutException: # Se deu 10 segundos e o elemento não apareceu, o vigia desiste
-        print("Pista 1 falhou (Timeout). Procurando Pista 2...")
-    except Exception as e:# Pega outros erros (ex: site não existe)
-        print(f"Erro ao analisar {base_url} com Selenium: {e}")
-        if driver:
-            driver.quit()
-        return None
+        # --- Pista 2: Varredura de Links Visíveis (<a>) ---
+        print("🔍 Varrendo links da página (href)...")
+        try:
+            possible_links = driver.find_elements(By.TAG_NAME, "a")
+            for link in possible_links:
+                try:
+                    href = link.get_attribute("href")
+                    if href:
+                        # Filtros para evitar falso positivo
+                        h_lower = href.lower()
+                        if any(x in h_lower for x in ["/rss", "/feed", ".xml"]) and "comments" not in h_lower:
+                            print(f"✅ ACHOU (Link visível): {href}")
+                            return urljoin(base_url, href)
+                except StaleElementReferenceException:
+                    continue # Elemento mudou, pula pro próximo
+        except Exception:
+            pass
 
-    # --- Pista 2 (Chute Educado) ---
-    # (Só roda se a Pista 1 falhou)
-    try:
-        possible_links = driver.find_elements(By.TAG_NAME, "a")
-        for link in possible_links:
-            href = link.get_attribute("href")
-            if href and ("rss" in href.lower() or "feed" in href.lower() or ".xml" in href.lower()):
-                print(f"Pista 2 (Chute Educado) encontrada: {href}")
-                return urljoin(base_url, href)
+        # --- Pista 3: Força Bruta (Tentativa Direta) ---
+        # Se nada funcionou, tenta acessar /feed ou /blog/feed na marra
+        print("🔨 Tentando Força Bruta (/feed)...")
+        common_paths = ["/feed", "/rss", "/blog/feed", "/news/feed"]
+        
+        for path in common_paths:
+            guess_url = urljoin(base_url, path)
+            try:
+                driver.get(guess_url)
+                # Se a página carregar e tiver XML no código fonte
+                page_source = driver.page_source[:500] # Olha só o começo
+                if "<?xml" in page_source or "<rss" in page_source or "<feed" in page_source:
+                    print(f"✅ ACHOU (Força Bruta): {guess_url}")
+                    return guess_url
+            except Exception:
+                continue
+
     except Exception as e:
-        print(f"Erro ao procurar Pista 2: {e}")
-        pass # Ignora erros aqui para garantir que o 'finally' rode
-
+        print(f"🚨 Erro crítico no Selenium: {e}")
+    
     finally:
         if driver:
-            driver.quit() # Sempre feche o navegador robô
+            driver.quit()
 
-    print(f"Nenhum feed RSS encontrado para {base_url}.")
+    print(f"❌ Desistindo. Nenhum RSS encontrado para {base_url}.")
     return None
-

@@ -27,8 +27,8 @@ async def lifespan(app: FastAPI):
     CoingekoFuncions.update_criptos_db_if_needed()
 
     print("Iniciando o servidor e o agendador de tarefas...")
-    scheduler.add_job(update_criptos_db, 'interval', hours=24, id="update_assets_24h")
-    scheduler.add_job(blog_catcher_worker, 'interval', minutes=2, id="blog_catcher_queue")
+    #scheduler.add_job(update_criptos_db, 'interval', hours=24, id="update_assets_24h")
+    #scheduler.add_job(blog_catcher_worker, 'interval', minutes=2, id="blog_catcher_queue")
 
     scheduler.start()
     yield

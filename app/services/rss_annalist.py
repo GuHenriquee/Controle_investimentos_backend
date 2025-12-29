@@ -12,7 +12,7 @@ def clean_html(raw_html: str) -> str:
     
     return cleantext
 
-def find_official_data(cripto_id: str, feed_url: str, days_to_check=7) -> List[OficialData]:
+def find_official_data(cripto_id: str, feed_url: str, days_to_check=30) -> List[OficialData]:
     
     print(f"Buscando anúncios em: {feed_url}")
     try:
@@ -37,12 +37,11 @@ def find_official_data(cripto_id: str, feed_url: str, days_to_check=7) -> List[O
             published_date = datetime(*published_timestamp[:6], tzinfo=timezone.utc)
             
             if published_date >= cutoff_date:
-                link = entry.link
                 summary_clean = entry.get("summary", "N/A")
                 summary_clean = clean_html(summary_clean)[:1000]
 
                 oficialData = OficialData(
-                    link=link, 
+                    link=entry.link, 
                     title=entry.title,
                     summary=summary_clean,
                     date=published_date, 

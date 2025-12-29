@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from api.v1.endpoints import create_user, cripto_data, crypto, login, stocks, shopping, operation, osint_analises, rss_tester
+from api.v1.endpoints import create_user, cripto_data, crypto, login, stocks, shopping, operation, osint_analises, rss_tester, WebscrapingTester
 
 api_router = APIRouter()
 
@@ -13,3 +13,4 @@ api_router.include_router(shopping.router, prefix="/shopping", tags=["Shopping"]
 api_router.include_router(cripto_data.router, prefix="/cripto_data", tags=["Cripto Data"])
 api_router.include_router(osint_analises.router, prefix="/osint_analises", tags=["OSINT Analyses"])
 api_router.include_router(rss_tester.router, prefix="/teste", tags=["Rss_tester"])
+api_router.include_router(WebscrapingTester.router, prefix="/find-rss", tags=["Rss_tester"])
