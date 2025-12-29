@@ -4,7 +4,7 @@ import websockets
 
 router = APIRouter()
 
-@router.websocket("/ws/{criptos}/{coin}")
+@router.websocket("/{criptos}/{coin}")
 async def coincapWebsocket(websocket: WebSocket, criptos, coin: str):
 
     await websocket.accept()

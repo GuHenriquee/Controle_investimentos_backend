@@ -7,7 +7,7 @@ from api.deps import SessionDep
 
 router = APIRouter()
 
-@router.post("/api/login/", status_code=200)
+@router.post("/", status_code=200)
 def isLoged(loginCredentiasl: Login, session: SessionDep)-> Token:
 
     queryEmail = select(UserInDB).where(UserInDB.email == loginCredentiasl.email)

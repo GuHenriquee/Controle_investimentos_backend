@@ -3,16 +3,14 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from models.cripto import CriptoProfile # Importe os novos modelos
 from schemas.cripto import CriptoRequest
 from services.coingeko_data import CoingekoFuncions
-from api.deps import SessionDep, CurrentUser
+from api.deps import SessionDep
 
 router = APIRouter()
 
-@router.post("/assets/add", status_code=201)
-def add_new_cripto_to_monitor(name: CriptoRequest, session: SessionDep, backGroundTask: BackgroundTasks,
-                             current_user: CurrentUser) -> CriptoProfile:
+@router.post("/", status_code=201)
+def add_new_cripto_to_monitor(name: CriptoRequest, session: SessionDep ) -> CriptoProfile:
    
     coin_id = name.coin_id
-    print(f"Usuário '{current_user.name}' solicitou adicionar o ativo: {coin_id}")
 
     existing_profile = session.get(CriptoProfile, coin_id)
     if existing_profile:

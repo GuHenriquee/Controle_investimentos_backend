@@ -7,3 +7,8 @@ from core.database import database
 
 SessionDep = Annotated[Session, Depends(database.get_session)]
 CurrentUser = Annotated[UserInDB, Depends(LoginAndJWT.get_current_active_user)]
+
+def addToDB(table: any, session: SessionDep)-> None:
+    session.add(table)
+    session.commit()
+    session.refresh(table)

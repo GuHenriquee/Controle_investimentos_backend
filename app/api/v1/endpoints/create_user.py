@@ -7,7 +7,7 @@ from api.deps import SessionDep
 
 router = APIRouter()
 
-@router.post("/api/register/", status_code=201) #201 = created
+@router.post("/", status_code=201) #201 = created
 def create_user(user: UserCreate, session: SessionDep)-> UserResponse:
 
     query = select(UserInDB).where(UserInDB.email == user.email) #criando consulta
